@@ -142,77 +142,24 @@
   /* ── HERO ── */
   .hero {
     min-height: 100vh;
-    background: var(--charcoal);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-mosaic {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 2px;
-    z-index: 0;
-  }
-
-  .hero-mosaic-tile {
-    position: relative;
-    overflow: hidden;
-    background: var(--charcoal-soft);
-    cursor: pointer;
-  }
-
-  .hero-mosaic-tile img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .hero-mosaic-tile .tile-add {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255,255,255,0.18);
-    font-size: 1.6rem;
-    transition: color 0.2s, background 0.2s;
-  }
-
-  .hero-mosaic-tile:hover .tile-add { color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.03); }
-  .hero-mosaic-tile.filled .tile-add { display: none; }
-  .hero-mosaic-tile input { display: none; }
-
-  .hero-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
     background:
-      radial-gradient(ellipse 62% 58% at 50% 46%, rgba(28,27,24,0.88) 0%, rgba(28,27,24,0.55) 55%, rgba(28,27,24,0.18) 100%),
-      linear-gradient(180deg, rgba(28,27,24,0.5) 0%, rgba(28,27,24,0.28) 25%, rgba(28,27,24,0.32) 75%, rgba(28,27,24,0.6) 100%);
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    min-height: 100vh;
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05), transparent 45%),
+      radial-gradient(circle at 80% 75%, rgba(255,255,255,0.04), transparent 50%),
+      linear-gradient(160deg, #201f1c 0%, var(--charcoal) 45%, var(--charcoal-soft) 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
     padding: 9rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
   }
 
   .hero::before {
     content: '';
     position: absolute;
     inset: 28px;
-    z-index: 2;
     border: 1px solid rgba(255,255,255,0.12);
     pointer-events: none;
   }
@@ -962,18 +909,13 @@
 
 <!-- HERO -->
 <section class="hero" id="home">
-  <div class="hero-mosaic" id="hero-mosaic"></div>
-  <div class="hero-overlay"></div>
+  <div class="hero-badge"><span>CHIC</span></div>
+  <p class="hero-subtitle">Clothing · Shoes · Accessories</p>
+  <p class="hero-tagline">A curated boutique for the woman who wants to look effortlessly put-together — new arrivals weekly, styled with an eye for the timeless and the trend.</p>
 
-  <div class="hero-content">
-    <div class="hero-badge"><span>CHIC</span></div>
-    <p class="hero-subtitle">Clothing · Shoes · Accessories</p>
-    <p class="hero-tagline">A curated boutique for the woman who wants to look effortlessly put-together — new arrivals weekly, styled with an eye for the timeless and the trend.</p>
-
-    <div class="hero-buttons">
-      <a href="#shop" class="btn btn-primary"><i class="ti ti-shopping-bag"></i> Shop the Collection</a>
-      <a href="#contact" class="btn btn-outline"><i class="ti ti-calendar-event"></i> Book an Appointment</a>
-    </div>
+  <div class="hero-buttons">
+    <a href="#shop" class="btn btn-primary"><i class="ti ti-shopping-bag"></i> Shop the Collection</a>
+    <a href="#contact" class="btn btn-outline"><i class="ti ti-calendar-event"></i> Book an Appointment</a>
   </div>
 </section>
 
@@ -1224,37 +1166,6 @@
     });
   });
 
-  // ── Hero mosaic ──
-  const HERO_TILE_COUNT = 6;
-  const heroMosaic = document.getElementById('hero-mosaic');
-  let heroImages = JSON.parse(localStorage.getItem('chic-hero-images') || '[]');
-
-  function renderHeroMosaic() {
-    let tiles = '';
-    for (let i = 0; i < HERO_TILE_COUNT; i++) {
-      const src = heroImages[i];
-      tiles += `
-        <label class="hero-mosaic-tile${src ? ' filled' : ''}">
-          ${src ? `<img src="${src}" alt="Chic Boutique">` : ''}
-          <span class="tile-add"><i class="ti ti-plus"></i></span>
-          <input type="file" accept="image/*" onchange="setHeroImage(${i}, this)">
-        </label>`;
-    }
-    heroMosaic.innerHTML = tiles;
-  }
-
-  function setHeroImage(index, input) {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      heroImages[index] = e.target.result;
-      localStorage.setItem('chic-hero-images', JSON.stringify(heroImages));
-      renderHeroMosaic();
-    };
-    reader.readAsDataURL(file);
-  }
-
   // ── About photo ──
   function setAboutImage(input) {
     const file = input.files[0];
@@ -1421,7 +1332,6 @@
   });
 
   // init
-  renderHeroMosaic();
   renderAboutImage();
   renderGallery();
   renderShop();
