@@ -1160,9 +1160,18 @@
   }
 
   document.querySelectorAll('.nav-links a').forEach(a => {
-    a.addEventListener('click', () => {
+    a.addEventListener('click', (e) => {
       document.querySelector('.nav-links').classList.remove('open');
       document.getElementById('burger-icon').className = 'ti ti-menu-2';
+
+      const targetId = a.getAttribute('href');
+      const target = targetId && targetId.length > 1 ? document.querySelector(targetId) : null;
+      if (target) {
+        e.preventDefault();
+        const navHeight = document.querySelector('nav').getBoundingClientRect().height;
+        const top = target.getBoundingClientRect().top + window.scrollY - navHeight;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
     });
   });
 
