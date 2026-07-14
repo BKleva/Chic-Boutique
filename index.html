@@ -349,6 +349,57 @@
 
   .about-img-placeholder input { display: none; }
 
+  /* ── GALLERY ── */
+  #gallery { background: var(--white); }
+
+  .gallery-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+
+  .gallery-grid { columns: 3; column-gap: 14px; margin-top: 2.25rem; }
+
+  @media (max-width: 768px) { .gallery-grid { columns: 2; } }
+  @media (max-width: 480px) { .gallery-grid { columns: 1; } }
+
+  .gallery-item {
+    break-inside: avoid;
+    margin-bottom: 14px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    background: var(--stone-pale);
+    border: 1px solid rgba(38,37,33,0.08);
+  }
+
+  .gallery-item img { width: 100%; display: block; transition: transform 0.35s; }
+  .gallery-item:hover img { transform: scale(1.04); }
+
+  .gallery-item .remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(38,37,33,0.7);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+
+  .gallery-item:hover .remove-btn { display: flex; }
+
+  .gallery-grid .shop-empty { column-span: all; }
+
   /* ── SHOP / INVENTORY ── */
   #shop { background: var(--stone-pale); }
 
@@ -822,6 +873,7 @@
   <a href="#home" class="nav-logo">CHIC<span>BOUTIQUE · NORTHFIELD</span></a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
+    <li><a href="#gallery">Gallery</a></li>
     <li><a href="#shop">Shop</a></li>
     <li><a href="#contact" class="nav-cta">Get In Touch</a></li>
   </ul>
@@ -861,6 +913,22 @@
         </label>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="container">
+    <div class="gallery-header">
+      <div>
+        <p class="section-label">In the Boutique</p>
+        <h2 class="section-title" style="margin-bottom:0">Gallery</h2>
+      </div>
+      <button class="add-item-btn" onclick="document.getElementById('gallery-input').click()"><i class="ti ti-upload"></i> Add Photos</button>
+      <input type="file" accept="image/*" multiple id="gallery-input" style="display:none" onchange="addGalleryImages(this)">
+    </div>
+
+    <div class="gallery-grid" id="gallery-grid"></div>
   </div>
 </section>
 
@@ -1046,6 +1114,7 @@
   <div class="footer-links">
     <a href="#home">Home</a>
     <a href="#about">About</a>
+    <a href="#gallery">Gallery</a>
     <a href="#shop">Shop</a>
     <a href="#contact">Contact</a>
   </div>
@@ -1089,6 +1158,52 @@
     if (src) {
       label.innerHTML = `<img class="about-img" src="${src}" alt="Chic Boutique"><input type="file" accept="image/*" id="about-img-input" onchange="setAboutImage(this)" style="display:none">`;
     }
+  }
+
+  // ── Gallery ──
+  const galleryGrid = document.getElementById('gallery-grid');
+  let galleryImages = JSON.parse(localStorage.getItem('chic-gallery') || '[]');
+
+  function renderGallery() {
+    if (!galleryImages.length) {
+      galleryGrid.innerHTML = `
+        <div class="shop-empty">
+          <i class="ti ti-photo"></i>
+          <p>Photos coming soon</p>
+          <p style="font-size:0.85rem">Check back for photos of the boutique, or add the first one.</p>
+        </div>`;
+      return;
+    }
+    galleryGrid.innerHTML = galleryImages.map((src, i) => `
+      <div class="gallery-item">
+        <img src="${src}" alt="Chic Boutique photo ${i + 1}" loading="lazy" onclick="openLightbox('${src}')">
+        <button class="remove-btn" onclick="removeGalleryImage(event, ${i})"><i class="ti ti-x"></i></button>
+      </div>`).join('');
+  }
+
+  function addGalleryImages(input) {
+    const files = Array.from(input.files);
+    let loaded = 0;
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        galleryImages.push(e.target.result);
+        loaded++;
+        if (loaded === files.length) {
+          localStorage.setItem('chic-gallery', JSON.stringify(galleryImages));
+          renderGallery();
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    input.value = '';
+  }
+
+  function removeGalleryImage(e, index) {
+    e.stopPropagation();
+    galleryImages.splice(index, 1);
+    localStorage.setItem('chic-gallery', JSON.stringify(galleryImages));
+    renderGallery();
   }
 
   // ── Inventory / Shop ──
@@ -1192,6 +1307,7 @@
 
   // init
   renderAboutImage();
+  renderGallery();
   renderShop();
 </script>
 </body>
